@@ -1,0 +1,185 @@
+\begin{thebibliography}{}
+
+\bibitem [\protect \citeauthoryear {%
+Colefax%
+, Butcher%
+, Pagendam%
+\BCBL {}\ \BBA {} Kelaher%
+}{%
+Colefax%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2019}}%
+}]{%
+colefax2019reliability}
+\APACinsertmetastar {%
+colefax2019reliability}%
+\begin{APACrefauthors}%
+Colefax, A\BPBI P.%
+, Butcher, P\BPBI A.%
+, Pagendam, D\BPBI E.%
+\BCBL {}\ \BBA {} Kelaher, B\BPBI P.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2019}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Reliability of marine faunal detections in drone-based
+  monitoring} {Reliability of marine faunal detections in drone-based
+  monitoring}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Ocean \& Coastal Management}{174}{}{108--115}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Hutchinson%
+\ \BBA {} Waser%
+}{%
+Hutchinson%
+\ \BBA {} Waser%
+}{%
+{\protect \APACyear {2007}}%
+}]{%
+hutchinson2007use}
+\APACinsertmetastar {%
+hutchinson2007use}%
+\begin{APACrefauthors}%
+Hutchinson, J\BPBI M.%
+\BCBT {}\ \BBA {} Waser, P\BPBI M.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2007}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Use, misuse and extensions of “ideal gas” models of
+  animal encounter} {Use, misuse and extensions of “ideal gas” models of
+  animal encounter}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Biological Reviews}{82}{3}{335--359}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Jones%
+, Freeman%
+, Rowcliffe%
+, Lucas%
+\BCBL {}\ \BBA {} Moorcroft%
+}{%
+Jones%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2015}}%
+}]{%
+Lucas}
+\APACinsertmetastar {%
+Lucas}%
+\begin{APACrefauthors}%
+Jones, K.%
+, Freeman, R.%
+, Rowcliffe, M.%
+, Lucas, T.%
+\BCBL {}\ \BBA {} Moorcroft, E.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2015}{02}{}.
+\newblock
+{\BBOQ}\APACrefatitle {A generalised random encounter model for estimating
+  animal density with remote sensor data} {A generalised random encounter model
+  for estimating animal density with remote sensor data}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Methods in Ecology and Evolution}{6}{}{}.
+\newblock
+\begin{APACrefDOI} \doi{10.1111/2041-210X.12346} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+O.Hoegh-Guldberg%
+\ \protect \BOthers {.}}{%
+O.Hoegh-Guldberg%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2018}}%
+}]{%
+IPCC2018}
+\APACinsertmetastar {%
+IPCC2018}%
+\begin{APACrefauthors}%
+O.Hoegh-Guldberg%
+, Jacob%
+, Taylor%
+, Bindi%
+, Brown%
+, Camilloni%
+\BDBL {}Zhou%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2018}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {{Impacts of 1.5{\textordmasculine}C global warming on
+  natural and human systems. An IPCC Special Report on the impacts of global
+  warming of 1.5°C above pre-industrial levels and related global greenhouse
+  gas emission pathways, in the context of strengthening the global response to
+  the threat of climate change, sustainable development, and efforts to
+  eradicate poverty}} {{Impacts of 1.5{\textordmasculine}C global warming on
+  natural and human systems. An IPCC Special Report on the impacts of global
+  warming of 1.5°C above pre-industrial levels and related global greenhouse
+  gas emission pathways, in the context of strengthening the global response to
+  the threat of climate change, sustainable development, and efforts to
+  eradicate poverty}}.{\BBCQ}.
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Rowcliffe%
+, Field%
+, Turvey%
+\BCBL {}\ \BBA {} Carbone%
+}{%
+Rowcliffe%
+\ \protect \BOthers {.}}{%
+{\protect \APACyear {2008}}%
+}]{%
+rowcliffe}
+\APACinsertmetastar {%
+rowcliffe}%
+\begin{APACrefauthors}%
+Rowcliffe, M.%
+, Field, J.%
+, Turvey, S.%
+\BCBL {}\ \BBA {} Carbone, C.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{2008}{08}{}.
+\newblock
+{\BBOQ}\APACrefatitle {Estimating animal density using camera traps without the
+  need for individual recognition} {Estimating animal density using camera
+  traps without the need for individual recognition}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Journal of Applied Ecology}{45}{}{1228-1236}.
+\newblock
+\begin{APACrefDOI} \doi{10.1111/j.1365-2664.2008.01473.x} \end{APACrefDOI}
+\PrintBackRefs{\CurrentBib}
+
+\bibitem [\protect \citeauthoryear {%
+Yapp%
+}{%
+Yapp%
+}{%
+{\protect \APACyear {1956}}%
+}]{%
+yapp1956theory}
+\APACinsertmetastar {%
+yapp1956theory}%
+\begin{APACrefauthors}%
+Yapp, W.%
+\end{APACrefauthors}%
+\unskip\
+\newblock
+\APACrefYearMonthDay{1956}{}{}.
+\newblock
+{\BBOQ}\APACrefatitle {The theory of line transects} {The theory of line
+  transects}.{\BBCQ}
+\newblock
+\APACjournalVolNumPages{Bird study}{3}{2}{93--104}.
+\PrintBackRefs{\CurrentBib}
+
+\end{thebibliography}
