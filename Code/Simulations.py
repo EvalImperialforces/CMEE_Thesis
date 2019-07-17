@@ -50,17 +50,18 @@ for i in range(1,100+1):
 
 
 def hit_evaluation (UAV_coord, Animal_coord):
+    pass
 
 
 
 def detection_zone (Camera):
     # FOV calculated per camera model in Strip_Sampling_Density.
 
-    if Camera == 'Garmin':
-        FOV = [83, 113]
-    else:
-        FOV = [113,75]
-    return FOV
+    camdict = {"garmin": [83,113], "sony": [113, 75]}
+    try:
+        return camdict[camera.lower()]
+    except KeyError:
+        raise KeyError ('Invalid camera model used, should be :'{}.format([x for x in camdict.keys()]))
 
 
 def get_truncated_normal(mean=0, sd=1, low=0, upp=10):
@@ -98,13 +99,6 @@ def start_uav (Camera):
     return FOV
 
 
-    camdict = {"garmin": [83,113]}
-    try:
-        return camdict[camera.lower()]
-    except KeyError:
-        raise KeyError (':{}'.format([x for x in camdict.keys()]))
-
-
 def find_sample_points(start_coords, end_coords, angle, speed_level):
 
     # Retrieves coordinates for x number of timesteps between 2 points
@@ -117,7 +111,7 @@ def find_sample_points(start_coords, end_coords, angle, speed_level):
     #s = speed_profile(speed_level) # sum of speeds, using index and value to add cumulatively
     #for index, value in s:
     #    s.append(speed_profile(speed_level))
-    # enuerate wraps and keeps a counter at same time - for loops through list gives value and index
+    # enumerate wraps and keeps a counter at same time - for loops through list gives value and index
 
     total_x = 0 # Sum of all x values (should be below x value of end_coord)
     total_y = 0 # Sum of all y values (should be below x value of end_coord)

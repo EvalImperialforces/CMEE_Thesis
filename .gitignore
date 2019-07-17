@@ -3,6 +3,8 @@
 *.pyc
 *.pdf
 *.aux
+*.Rhistory
+*.RData
 *.jpg
 *.png
 *.xlsx
@@ -22,3 +24,4 @@ MissionPlanner/
 Proposal/
 Results/
 Writeup/
+.ipynb_checkpoints
