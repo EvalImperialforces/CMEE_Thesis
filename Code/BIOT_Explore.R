@@ -260,3 +260,10 @@ Maldive_count <- cbind(Maldive_count, Duration$Duration)
 Duration_minutes <- lapply(Duration, function(x) {x/60})
 Maldive_count <- cbind(Maldive_count, Duration_minutes$Duration)
 
+# Animal speeds
+
+# Maximum based on blue shark: 24mph - 10.72m/s (http://www.elasmo-research.org/education/topics/r_haulin'_bass.htm)
+# Average based on blue shark cruise speed: 17mph - 7.6m/s
+# Lowest based on large shark cruise speed: 1.5 mph - 0.7m/s
+# Maximum ray speed is 24km/h - 6.6m/s (https://en.wikipedia.org/wiki/Reef_manta_ray#cite_ref-16)
+# Airspeed for 138 bird species 8 - 23m/s but gulls and terns in lower part of this range between 8 and 15? (Alerstam,07
