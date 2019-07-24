@@ -14,156 +14,35 @@ library(ggplot2)
 library(ggthemes)
 
 
+# Import cleaned datasets from the Data_Wrangling
+source('Data_Wrangling.R')
 
-df <- read.csv("../Data/Metadata/BIOT_2018.csv", header = T)
-# Grounded stills removed from original dataset
-df <- subset(df, select = -c(X)) # Weird NA column
-df <- subset(df, Flight.or.Grounded == 'Flight')
-#biot <- na.omit(biot) # Remove flights with no Lat/Long = Maldives 
-F1 <- read.csv("../Data/Metadata/Fixed_Flights/Flight1_revised.csv", header = T)
-F1 <- F1[, 1:28]
-names(F1)[6] <- 'Time'
-F3 <- read.csv("../Data/Metadata/Fixed_Flights/Flight3_revised.csv", header = T)
-F3 <- F3[, 1:28]
-F7 <- subset(df, Flight == 7)
-F7 <- F7[, 1:28]
-names(F7)[2] <- 'Image.ID'
-F8 <- subset(df, Flight == 8)
-names(F8)[2] <- 'Image.ID'
-F8 <- F8[, 1:28]
-names(F8)[2] <- 'Image.ID'
-F10 <- read.csv("../Data/Metadata/Fixed_Flights/Flight10_revised.csv", header = T)
-F11 <- subset(df, Flight == 11)
-F11 <- F11[, 1:28]
-names(F11)[2] <- 'Image.ID'
-F12 <- subset(df, Flight == 12)
-F12 <- F12[, 1:28]
-names(F12)[2] <- 'Image.ID'
-
-
-biot <- rbind(F1, F3, F7, F8, F10, F11, F12)
-
-
-################################## Strip Sampling ######################################
-
-# Pseudoreplication as we must account for number of objects counted within each area
-
-# Formula: D = n / a
-# D is density
-# n is total number of objects counted
-# a is 2wl or rather sampled area
-
-# So pseudorep will reduce estimates to remove repeated individuals (in runs)
-# area counted by FOV * distance (length of flight)
-
-
-
-################################### Pseudo-rep ##########################################
-
-
-Image_Overlap <- function(flight_no, start_col, end_col){
-  
-  # Subset data where animals are captured
-  # Count repeated occurences to calculate mean overlap per flight
-  # Function only looks at runs and not total number of animals
-  
-  # flight_no = Flight Number
-  # start_col = First column of animal capture recording
-  # end_col = Last column of animal capture recording
-  
-  df <- subset(biot, biot$Flight == flight_no)
-  #df <- df[,1:end_col] # Up to last capture
-  df$Image.ID <- as.character(df$Image.ID)
-  df <- df[,-grep("Total", colnames(df))] # Remove total columns
-  index <- which(df > 0, arr.ind = T, useNames = T) # Array of dims for captures in subset
-  # The column index is subject to your specific subset so do all together 
-  index <- subset(index, index[,2] >= start_col)
-  index <- subset(index, index[,2] <= end_col)
-  #print(index)
-  # Compare shifted datasets to calculate hits
-  ind1 <- head(index, -1) # Remove last row
-  ind2 <- index[-1,] # Remove first row
-  counter <- 0
-  hit_mat <- c()
-  for(i in 1:length(ind1[,1])){
-    if ((ind2[i,1] - ind1[i,1]) == 1 && ind1[i,2] == ind2[i,2]){
-      counter <- counter 
-      new_row <- c(counter, colnames(df)[(ind1[i,2])])
-      hit_mat <- rbind(hit_mat, new_row)
-    }
-    else {
-      counter <- counter + 1
-      next}
-  }
-  hit_df <- as.data.frame(hit_mat)
-  colnames(hit_df) <- c("Hits", "Animals")
-  Actual_hits <- hit_df %>% group_by(Hits, Animals) %>% summarise(Actual_hits=n()+1)
-  #print(Actual_hits)
-  if(nrow(Actual_hits) == 1){
-    # If there is one occurence of overlap, take that as average
-    Average <- as.numeric(Actual_hits[1,3])
-  }
-  else{
-    #print(sum(Actual_hits$Actual_hits))
-    #print(nrow(Actual_hits))
-    Average <- (sum(Actual_hits$Actual_hits))/(nrow(Actual_hits))}
-  return(Average)
-}
-
-
-
-Image_Removal <- function(flight_no){
-  # From the first image, jumps every x number of images and subsets accordingly
-  Flight_df <- subset(biot, biot$Flight == flight_no)
-  overlap_no <- floor(suppressWarnings(Image_Overlap(flight_no, 13, 28)))
-  New_Flight <- c()
-  for(i in 1:nrow(Flight_df)){
-    if (i %% overlap_no == 1){
-      New_Flight <- rbind(New_Flight, Flight_df[i,])
-    }
-  }
-  flight_no <- as.data.frame(New_Flight)
-  return(flight_no)
-}
-
-
-
-New_Flight1 <- Image_Removal(1)
-New_Flight3 <- Image_Removal(3)
-New_Flight7 <- Image_Removal(7)
-New_Flight8 <- Image_Removal(8)
-New_Flight10 <-Image_Removal(10)
-New_Flight11 <- Image_Removal(11)
-New_Flight12 <- Image_Removal(12)
-
-
-biot_lite <- rbind(New_Flight1, New_Flight3, New_Flight7, New_Flight8, New_Flight10, New_Flight11, New_Flight12)
-
-
-# From Mulero Palzmany et al., 14 could rely on percentage overlap to calculate area and then reduce the number of individuals depending on runs? 
-
-
-#  O <-  ((k*h) - (S/P)) / (k*h)
-
-#  O is overlapping (%), h is altitude AGL (m), S is speed of the plane (m/s), P is the number of pictures the camera takes per second.
-#  k is a constant that depends on cameras vertical sensor dimension. The equation to calculate it is: k = df/f
-#  dv is vertical dimension of the sensor (5.6 mm in our camera), f is local length (5.1 mm in our camera) k~1:09 for the camera we used.
-
-# This would be the same for every flight?
-
-
-
+# Import original files for duration 
+original_biot <- read.csv("../Data/Metadata/BIOT/BIOT_2018.csv", header = T)
+# Subset by particular flights
+original_biot <- original_biot[original_biot$Flight == 1 | original_biot$Flight == 3 | original_biot$Flight == 7 | original_biot$Flight == 8 | original_biot$Flight == 10 | original_biot$Flight == 11 | original_biot$Flight == 12,  ]
+original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
+original_bel1 <- cbind('Flight' = 1, original_bel1)
 
 ######################## Total count for each flight ###################################
 
 
-Total_count_lite <- biot_lite %>%
+biot_sum <- biot_lite %>%
   group_by(Flight) %>% 
-  tally(c(TotalElasmo, TotalBirds, FruitBat, Human)) 
+  tally(c(Reefshark, Nurseshark, Whaleshark, Eagleray, Mantaray, Whitetern, 
+          Sootytern, Tern_other, Redfootedboobie, Frigatebird, Brownnoddy_any, 
+          Bird, FruitBat, Human))
+
+belize_sum <- belize_lite %>%
+  group_by(Flight) %>% 
+  tally(c(Er1., Er2., manatee., turtle., ray., shark.))
 
 
+total_count <- rbind(biot_sum, belize_sum)
+# Rename Belize flights
+total_count[8,1] <- 13
 
-Species_count <- biot_lite %>%
+Species_count_biot <- biot_lite %>%
   group_by(Flight) %>% 
   summarise(Reef_shark = sum(Reefshark),
             Nurse_shark = sum(Nurseshark),
@@ -199,17 +78,22 @@ Duration_per_flight <- function(df){
 }
 
 
-Images_used <- Duration_per_flight(biot_lite)
-Duration <- Duration_per_flight(biot) # Full flight time
+Images_biot <- Duration_per_flight(original_biot)
+Images_belize <- Duration_per_flight(original_bel1)
+
+Duration <- rbind(Images_biot, Images_belize)
+
+#Duration <- Duration_per_flight(biot) # Full flight time
 # Total_count <- cbind(Total_count, Duration)
 #Duration <- Duration[-c(3,4,5,8),] # Remove unwanted flights
-Total_count_lite <- cbind(Total_count_lite, Images_used)
-Total_count_lite <- cbind(Total_count_lite, Duration)
+
+
+total_count <- cbind(total_count, Duration)
 
 
 Duration_minutes <- lapply(Duration, function(x) {x/60})
 #Total_count <- cbind(Total_count, Duration_minutes$Duration)
-Total_count_lite <- cbind(Total_count_lite, Duration_minutes$Duration)
+total_count <- cbind(total_count, Duration_minutes$Duration)
 
 
 
