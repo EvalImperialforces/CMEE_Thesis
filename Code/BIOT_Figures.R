@@ -14,10 +14,12 @@ library(ggplot2)
 library(ggthemes)
 
 
-biot <- read.csv("../Data/BIOT_2018.csv", header = T)
-# Grounded stills removed from original dataset
+# Import cleaned datasets from the Data_Wrangling
+#source('Data_Wrangling.R')
 
-biot <- na.omit(biot) # Remove flights with no Lat/Long = Maldives
+biot <- read.csv("../Data/Metadata/BIOT/BIOT_2018.csv", header = T)
+# Grounded stills removed from original dataset
+#biot <- na.omit(biot) # Remove flights with no Lat/Long = Maldives
 
 
 ##################### Species Count Barplot ##########################
@@ -55,17 +57,28 @@ sp.bar$Total <- apply(sp.bar, 1, function(x) sum(x)) # Total
 sp.bar$Prop <- lapply(sp.bar$Total, function(x) x/sum(sp.bar$Total))
 
 
-
-bar.plot <- ggplot(data = sp.bar, aes(x = rownames(sp.bar), y = Prop)) +
-  geom_bar(stat = "identity") +
+pdf(file = paste("../Results/Frequency.pdf", sep = ""))
+print(ggplot(data = sp.bar, aes(x = rownames(sp.bar), y = Prop)) +
+  geom_bar(stat = "identity", fill = "dodgerblue3") +
   xlab("Species") +
   ylab("Proportion") +
   scale_x_discrete(limits = rownames(sp.bar)) +
   theme_clean() +
-  theme(axis.text.x = element_text(angle = 50), axis.ticks.length = unit(.5, "cm")) 
+  theme(axis.text.x = element_text(angle = 50), axis.ticks.length = unit(.5, "cm"))) 
+
+dev.off()
 
 
+bar.plot <- ggplot(data = sp.bar, aes(x = rownames(sp.bar), y = Prop)) +
+  geom_bar(stat = "identity", fill = "dodgerblue3") +
+  xlab("Species") +
+  ylab("Proportion") +
+  scale_x_discrete(limits = rownames(sp.bar)) +
+  theme_clean() +
+  theme(axis.text.x = element_text(angle = 54), axis.ticks.length = unit(.5, "cm")) +
+  scale_fill_brewer(palette = "Dark2")
 
+bar.plot
 
 ######################## Speed Profiles ##############################
 

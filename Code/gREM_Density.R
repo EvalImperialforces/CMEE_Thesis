@@ -19,10 +19,12 @@ source('Data_Wrangling.R')
 
 # Import original files for duration 
 original_biot <- read.csv("../Data/Metadata/BIOT/BIOT_2018.csv", header = T)
+original_biot <- subset(original_biot, original_biot$Flight.or.Grounded == 'Flight') # All images in flight
 # Subset by particular flights
 original_biot <- original_biot[original_biot$Flight == 1 | original_biot$Flight == 3 | original_biot$Flight == 7 | original_biot$Flight == 8 | original_biot$Flight == 10 | original_biot$Flight == 11 | original_biot$Flight == 12,  ]
-original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
-original_bel1 <- cbind('Flight' = 1, original_bel1)
+#original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
+#original_bel1 <- cbind('Flight' = 1, original_bel1)
+
 
 ######################## Total count for each flight ###################################
 
@@ -67,7 +69,8 @@ Species_count_biot <- biot_lite %>%
 
 
 # Original metadata file duration
-# Can I use the full flight biot time on the biot_lite dataset? I would say yes because the overlap is only to fix encounter rate
+# Can I use the full flight biot time on the biot_lite dataset? I would say yes because the overlap is only to fix encounter rate and calculate area
+# Full flight duration used to calculate accurate speed
 
 
 Duration_per_flight <- function(df){
@@ -79,9 +82,10 @@ Duration_per_flight <- function(df){
 
 
 Images_biot <- Duration_per_flight(original_biot)
-Images_belize <- Duration_per_flight(original_bel1)
+# Belize duration from LOG_BELIZE_FLIGHTS.xlsx acording to observer (first 10 flights)
+Duration_belize <- c(960, 1380, 1500, 1620, 300, 840, 960)
 
-Duration <- rbind(Images_biot, Images_belize)
+Duration <- rbind(Images_biot, Duration_belize[1])
 
 #Duration <- Duration_per_flight(biot) # Full flight time
 # Total_count <- cbind(Total_count, Duration)
@@ -134,7 +138,9 @@ Calculate_distance <- function(df){
 
 
 # Add vector to df
-Distance <- Calculate_distance(biot_lite)
+Distance_BIOT <- Calculate_distance(biot_lite)
+Distance_belize <- Calculate_distance(belize_lite)
+Distance <- rbind(Distance_BIOT, Distance_belize)
 #Distance <- Distance[-c(3,4,5,8),] # Remove unwanted flights
 
 # Add supposed distances from Melissas report 
@@ -145,32 +151,34 @@ f10 <- 5.74*1000
 f11 <- 33.5*1000
 f12 <- 33.5*1000
 
+# Use recorded distances on log instead of calculated - slightly off but who knows.
+f13 <- 10.89*1000
+
 Distance[3,2] <- f7
 Distance[4,2] <- f8
 Distance[5,2] <- f10
 Distance[6,2] <- f11
 Distance[7,2] <- f12
+Distance[8,2] <- f13
+
+total_count <- cbind(total_count, Distance$Distance)
+total_count <- cbind(total_count, Distance$Distance/1000)
 
 
-Total_count_lite <- cbind(Total_count_lite, Distance$Distance)
-Total_count_lite <- cbind(Total_count_lite, Distance$Distance/1000)
+names(total_count)[2] <- "Captures"
+names(total_count)[3] <- "Duration_(seconds)"
+names(total_count)[4] <- "Duration_(minutes)"
+names(total_count)[5] <- "Distance_(metres)"
+names(total_count)[6] <- "Distance_(km)"
 
 
-names(Total_count_lite)[2] <- "Captures"
-names(Total_count_lite)[3] <- "Images_used"
-names(Total_count_lite)[4] <- "Duration (seconds)"
-names(Total_count_lite)[5] <- "Duration (minutes)"
-names(Total_count_lite)[6] <- "Distance (metres)"
-names(Total_count_lite)[7] <- "Distance (km)"
+total_count <- total_count %>% mutate(Speed <- (total_count [,5]/ total_count [,3]))
+total_count <- total_count %>% mutate(Speed <- (total_count [,5]/ total_count [,3]) * 3.6)
 
+names(total_count)[7] <- "Speed_(m/s)"
+names(total_count)[8] <- "Speed_(km/h)"
 
-Total_count_lite <- Total_count_lite %>% mutate(Speed <- (Total_count_lite[,6]/ Total_count_lite[,4]))
-Total_count_lite <- Total_count_lite %>% mutate(Speed <- (Total_count_lite[,6]/ Total_count_lite[,4]) * 3.6)
-
-names(Total_count_lite)[8] <- "Speed (m/s)"
-names(Total_count_lite)[9] <- "Speed (km/h)"
-
-Average_speed_overall <- sum(Total_count_lite[,8]/ nrow(Total_count_lite)) # 17.8 m/s or 64 km/h
+#Average_speed_overall <- sum(Total_count_lite[,8]/ nrow(Total_count_lite)) # 17.8 m/s or 64 km/h
 #hist(Total_count_lite[,9])
 
 #################################### FOV ###############################################
@@ -195,34 +203,88 @@ Average_speed_overall <- sum(Total_count_lite[,8]/ nrow(Total_count_lite)) # 17.
 # Flight altidude calculated in BIOT_Explore according to 6 decent TLOGS : 49.84m = 50m
 
 # Garmin
-sensor.h <- 4.55
-sensor.v <- 6.17
-f <- 2.73
-alt <- 50
+g_sensor.h <- 4.55
+g_sensor.v <- 6.17
+g_f <- 2.73
+g_alt <- 50
 
 # Sony DSLR ILCE-5100
-sensor.h <- 23.5
-sensor.v <- 15.6
-f <- 16
-alt <- 77.5
+s_sensor.h <- 23.5
+s_sensor.v <- 15.6
+s_f <- 16
+s_alt <- 77.5
 
-coverage.h <- (sensor.h/f)*alt
-coverage.v <- (sensor.v/f)*alt
+g_coverage.h <- (g_sensor.h/g_f)*g_alt
+g_coverage.v <- (g_sensor.v/g_f)*g_alt
+
+s_coverage.h <- (s_sensor.h/s_f)*s_alt
+s_coverage.v <- (s_sensor.v/s_f)*s_alt
+
+garmin_m2 <- g_coverage.h * g_coverage.v
+sony_m2 <- s_coverage.h * s_coverage.v
 
 
-Area_covered_m2 <- coverage.h * coverage.v
+
+###################################### Calculate Area ############################################
+
+# Two different methodologies here - practically analogous but not producing the same figures??
+# gREM method changed to account for a moving sensor
+# Strip sampling method which is more realisitc
+
+# Duration of pseudo-flight, i.e number of images for calcArea
+pseudo_BIOT <-  Duration_per_flight(biot_lite)
+pseudo_belize <-  Duration_per_flight(belize_lite)
+pseudo_duration <- rbind(pseudo_BIOT, pseudo_belize)
+
+pseudo_garmin <- pseudo_duration[1:5,]
+pseudo_sony <- pseudo_duration[5:8,]
+
+
+
+calcArea <- function(FOV, no_images){
+  #Calculate area per survey in metres squared
+  #Average covered by camera which is influenced by altitude and position (tilt, roll, pitch)
+
+  #FOV: calculated for each camera model (2rv)
+  return (A <- (FOV * no_images))
+}
+
+Flight_Area_m2 <- function(no.images, fov){
+  return(Area <- sapply(no.images, function(x) calcArea(fov, x)))
+}
+
+
+# Get total area m2
+Area_BIOT <- Flight_Area_m2(pseudo_garmin, garmin_m2)
+Area_mal_bel <- Flight_Area_m2(pseudo_sony, sony_m2)
+gREM_Area <- c(Area_BIOT, Area_mal_bel)
+#total_count <- cbind(total_count, Total_Area)
+
+
+# Strip sampling area
+Straight_Area_m2 <- function(df, fov_width){
+  Area_m2 <- sapply(df$`Distance_(metres)`, function (x) x * fov_width)
+  return(Area_m2)
+}
+
+garmin_data <- total_count[1:5,]
+sony_data <- total_count[6:8,]
+strip_area_garmin <- Straight_Area_m2(garmin_data, g_coverage.v)
+strip_area_sony <- Straight_Area_m2(sony_data, s_coverage.v)
+strip_area <- c(strip_area_garmin, strip_area_sony)
+total_count <- cbind(total_count, strip_area)
+
+# Get total area km2
+Total_Area_km2 <- sapply(total_count$strip, function(x) x/1000)
+total_count <- cbind(total_count, Total_Area_km2)
+
+
 
 #################################### Calculating Density ###########################################
 
-# So our total distance for each flight was calculated using every flight image because of lat/long points
-
-calcArea <- function(D){
-  # Calculate area per survey in metres squared
-  # Average covered by camera which is influenced by altitude and position (tilt, roll, pitch)
-  # D : Distance calculated for each survey using VincentyEllipsoid function between lat/long points recorded each second
-  
-  return (A <- (Area_covered_m2 + D))
-}
+# So our total distance for each flight was calculated using every flight image because of lat/long  
+# My biggest issue with the area calc is the 2rvt element of the equation - FOV*t but t?? It can't be the original time in seconds because
+# that isn't taking into acount image overlap - our sensor is moving. So I wll have to take it 2rv*pseudo-t really (same thing)
 
 
 calcDensity <- function(z, A){
@@ -240,35 +302,64 @@ calcDensity <- function(z, A){
 
 # Calculate Area (m2) and Density for each flight
 
-Flight_Density <- function(df){
+Flight_Density <- function(total_df){
   # Calculate area and subsequent density for each flight
   Density_vec <- c()
-  for(i in 1:nrow(df)){
-    Area <- sapply(df[i,5], function(x) calcArea(x))
-    #print(paste("Area is", Area, "m2"))
-    Density <- sapply(df[i,2],  function(x) calcDensity(x[1], Area))
-    #print(paste("Density is", Density, "m2"))
+  for(i in 1:nrow(total_df)){
+    # Calculate densities for each area and capture rate
+    Density <- calcDensity(total_df$Captures[i], Total_Area_km2[i])
     Density_vec <- c(Density_vec, Density)
   }
   return(Density_vec)
 }
 
-final <- Flight_Density(Total_count_lite)
-Total_count_lite <- cbind(Total_count_lite, final)
-print(Total_count_lite)
 
 
-Average_speed <- function(df){
-  Average_speed <- c()
-  for(i in 1:nrow(df)){
-    speed <- (df[i,5])/(df[i,3])
-    Average_speed <- c(Average_speed, speed)
-  }
-  return(Average_speed)
-}
+# Calculate densities for each dataset
+Density_Estimate_km2 <- Flight_Density(total_count)
 
-Speed_ms <- Average_speed(Total_count_lite)
-Speed_kmh <- sapply(Speed_ms, function(x) x*3.6)
+total_count <- cbind(total_count, Density_Estimate_km2)
+#total_count <- within(total_count, rm(Density_Estimate_m2))
 
-Total_count_lite <- cbind(Total_count_lite, Speed_ms)
-Total_count_lite <- cbind(Total_count_lite, Speed_kmh)
+
+
+
+
+
+
+# Tom's figures
+
+####### Density per flight #######
+tc_no8 <- total_count[-4,]
+tc_no8 <- cbind(a = c(1,2,3,4,5,6,7), tc_no8)
+
+pdf(file = paste("../Results/Density_per_flight.pdf", sep = ""))
+print(ggplot(data = tc_no8, aes(x = tc_no8$a, y = tc_no8$Density_Estimate_km2)) +
+                      geom_point() +
+                      xlab("Flight Number") +
+                      ylab(expression(paste(
+                        "Density Estimate (per",
+                         km^2,
+                        ")", sep=""))) +
+                      scale_x_continuous(breaks = c(1, 2, 3, 4, 5, 6, 7)) +
+                      theme_bw())
+dev.off()
+
+
+#hist(tc_no8$Density_Estimate_km2)
+
+
+###### Density per area #######
+
+
+ggplot(data = tc_no8, aes(x = tc_no8$Total_Area_km2, y = tc_no8$Density_Estimate_km2)) +
+  geom_point() +
+  xlab(expression(paste(
+    "Area( per",
+    km^2,
+    ")", sep=""))) +
+  ylab(expression(paste(
+    "Density Estimate ( per",
+    km^2,
+    ")", sep=""))) +
+  theme_bw()
