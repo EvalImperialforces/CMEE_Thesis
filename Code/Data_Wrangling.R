@@ -113,6 +113,7 @@ Image_Overlap <- function(flight_no, dataset = biot, start_col = 13, end_col = 2
       next}
   }
   hit_df <- as.data.frame(hit_mat)
+  #print(hit_df)
   colnames(hit_df) <- c("Hits", "Animals")
   Actual_hits <- hit_df %>% group_by(Hits, Animals) %>% summarise(Actual_hits=n()+1)
   #print(Actual_hits)
@@ -124,16 +125,23 @@ Image_Overlap <- function(flight_no, dataset = biot, start_col = 13, end_col = 2
     #print(sum(Actual_hits$Actual_hits))
     #print(nrow(Actual_hits))
     Average <- (sum(Actual_hits$Actual_hits))/(nrow(Actual_hits))}
-  return(Average)
+  return(Actual_hits)
 }
 
-#Image_Overlap(1, belize, 7, 12)
-#Image_Overlap(3)
+#Over_1 <- Image_Overlap(1)
+#Over_3 <- Image_Overlap(3)
+#Over_7 <- Image_Overlap(7)
+#Over_8 <- Image_Overlap(8)
+#Over_10 <- Image_Overlap(10)
+#Over_11 <- Image_Overlap(11)
+#Over_12 <- Image_Overlap(12)
+#Over_bel <- Image_Overlap(1, belize, 7, 12)
+
 
 Image_Removal <- function(flight_no, dataset = biot, start = 13, end = 26){
   # From the first image, jumps every x number of images and subsets accordingly
   Flight_df <- subset(dataset, dataset$Flight == flight_no)
-  overlap_no <- floor(suppressWarnings(Image_Overlap(flight_no, dataset, start, end))) # Warnings relating to non-integer variables
+  overlap_no <- ceiling(suppressWarnings(Image_Overlap(flight_no, dataset, start, end))) # Warnings relating to non-integer variables
   New_Flight <- c()
   for(i in 1:nrow(Flight_df)){
     if (i %% overlap_no == 1){

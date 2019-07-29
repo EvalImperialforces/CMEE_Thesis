@@ -22,9 +22,10 @@ original_biot <- read.csv("../Data/Metadata/BIOT/BIOT_2018.csv", header = T)
 original_biot <- subset(original_biot, original_biot$Flight.or.Grounded == 'Flight') # All images in flight
 # Subset by particular flights
 original_biot <- original_biot[original_biot$Flight == 1 | original_biot$Flight == 3 | original_biot$Flight == 7 | original_biot$Flight == 8 | original_biot$Flight == 10 | original_biot$Flight == 11 | original_biot$Flight == 12,  ]
-#original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
+original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
 #original_bel1 <- cbind('Flight' = 1, original_bel1)
-
+original_bel1<- na.omit(original_bel1) 
+original_bel1 <- cbind('Flight' = 1, original_bel1)
 
 ######################## Total count for each flight ###################################
 
@@ -122,6 +123,11 @@ Calculate_dist_per_flight <- function(flight_no, d){
   return(sum(segDists))
 }
 
+#orig_10 <- Calculate_dist_per_flight(10,original_biot)
+#lite_10 <- Calculate_dist_per_flight(10, biot_lite)
+#orig_bel <- Calculate_dist_per_flight(1, original_bel1)
+#lite_bel <- Calculate_dist_per_flight(1, belize_lite)
+
 
 Calculate_distance <- function(df){
   Distance <- c()
@@ -138,8 +144,8 @@ Calculate_distance <- function(df){
 
 
 # Add vector to df
-Distance_BIOT <- Calculate_distance(biot_lite)
-Distance_belize <- Calculate_distance(belize_lite)
+Distance_BIOT <- Calculate_distance(original_biot)
+Distance_belize <- Calculate_distance(original_bel1)
 Distance <- rbind(Distance_BIOT, Distance_belize)
 #Distance <- Distance[-c(3,4,5,8),] # Remove unwanted flights
 
@@ -147,19 +153,19 @@ Distance <- rbind(Distance_BIOT, Distance_belize)
 
 f7 <- 10.7*1000
 f8 <- 13.1*1000
-f10 <- 5.74*1000
+#f10 <- 5.74*1000
 f11 <- 33.5*1000
 f12 <- 33.5*1000
 
 # Use recorded distances on log instead of calculated - slightly off but who knows.
-f13 <- 10.89*1000
+#f13 <- 10.89*1000
 
 Distance[3,2] <- f7
 Distance[4,2] <- f8
-Distance[5,2] <- f10
+#Distance[5,2] <- f10
 Distance[6,2] <- f11
 Distance[7,2] <- f12
-Distance[8,2] <- f13
+#Distance[8,2] <- f13
 
 total_count <- cbind(total_count, Distance$Distance)
 total_count <- cbind(total_count, Distance$Distance/1000)
@@ -237,7 +243,7 @@ pseudo_belize <-  Duration_per_flight(belize_lite)
 pseudo_duration <- rbind(pseudo_BIOT, pseudo_belize)
 
 pseudo_garmin <- pseudo_duration[1:5,]
-pseudo_sony <- pseudo_duration[5:8,]
+pseudo_sony <- pseudo_duration[6:8,]
 
 
 
@@ -258,7 +264,8 @@ Flight_Area_m2 <- function(no.images, fov){
 Area_BIOT <- Flight_Area_m2(pseudo_garmin, garmin_m2)
 Area_mal_bel <- Flight_Area_m2(pseudo_sony, sony_m2)
 gREM_Area <- c(Area_BIOT, Area_mal_bel)
-#total_count <- cbind(total_count, Total_Area)
+gREM_km <- sapply(gREM_Area, function(x) x/1000)
+total_count <- cbind(total_count, gREM_km)
 
 
 # Strip sampling area
@@ -272,7 +279,8 @@ sony_data <- total_count[6:8,]
 strip_area_garmin <- Straight_Area_m2(garmin_data, g_coverage.v)
 strip_area_sony <- Straight_Area_m2(sony_data, s_coverage.v)
 strip_area <- c(strip_area_garmin, strip_area_sony)
-total_count <- cbind(total_count, strip_area)
+Strip_km <- sapply(strip_area, function(x) x/1000)
+total_count <- cbind(total_count, Strip_km)
 
 # Get total area km2
 Total_Area_km2 <- sapply(total_count$strip, function(x) x/1000)
