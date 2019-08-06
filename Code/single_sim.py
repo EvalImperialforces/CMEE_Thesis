@@ -86,7 +86,7 @@ def get_speed(individual, level = 0):
     return s
 
 
-def find_sample_points(start_coord, end_coord, angle, individual, speed_level = 0, probability = 0):
+def find_sample_points(start_coord, end_coord, angle, individual, speed_level = 0, probability = 0, timestep = 1000):
 
     # Retrieves coordinates for x number of timesteps between 2 points
     
@@ -112,8 +112,8 @@ def find_sample_points(start_coord, end_coord, angle, individual, speed_level = 
     while True:
         s = get_speed(individual, speed_level) # get our speed for this step
         total_length_covered += s # cumulatively add to total length covered
-        #print(total_length_covered)
-        if total_length_covered > length:
+        #print(iteration)
+        if total_length_covered > length or iteration > timestep:
             break
         
         point_probability = np.random.choice(100,1) # assign probability to coordinate
@@ -138,7 +138,8 @@ def find_sample_points(start_coord, end_coord, angle, individual, speed_level = 
 
     sample_coords = list(zip(x_list, y_list))     # zip up to create list of tuples, each being a set of coordinates where a sample has been taken
     
-    Actual_length = total_length_covered - s
+    
+    sample_coords = sample_coords[0:timestep]
     
     
     return sample_coords 
@@ -156,8 +157,10 @@ def detection_zone(camera):
         raise KeyError ('Invalid camera model used, should be :{}'.format([x for x in camdict.keys()]))
 
 
-def boundary_coords_uav(camera):
+
+def boundary_coords_uav(camera, boundary_length = 5000):
     
+    # Boundary_length (m)
     # x and y coordinates 
     # coord 1 = bottom righthand side (0,0)
     # coord 2 = bottom lefthand side (7500,0)
@@ -167,9 +170,9 @@ def boundary_coords_uav(camera):
     area = detection_zone(camera)
     half_area = [x/2  for x in area]
     boundary = {'coord_1' : [(0 + half_area[0]), (0 + half_area[1])],
-                'coord_2' : [(7500 - half_area[0]), (0 + half_area[1])],
-                'coord_3' : [(7500 - half_area[0]), (7500 - half_area[1])],
-                'coord_4' : [(0 + half_area[0]), (7500 - half_area[1])]}
+                'coord_2' : [((boundary_length) - half_area[0]), (0 + half_area[1])],
+                'coord_3' : [((boundary_length) - half_area[0]), ((boundary_length) - half_area[1])],
+                'coord_4' : [(0 + half_area[0]), ((boundary_length) - half_area[1])]}
     
     return boundary
 
@@ -180,8 +183,7 @@ def boundary_coords_uav(camera):
 
 
 
-
-def figure_8 (camera, speed_level=1):
+def figure_8 (camera, speed_level=1, timestep = 1000):
     
     # Figure 8 path simulation which will depend on boundary coords from camera model 
     # Returns vector of coords from simulated flight
@@ -196,6 +198,7 @@ def figure_8 (camera, speed_level=1):
     leg_4 = find_sample_points(bc['coord_3'], bc['coord_1'], 225, 'uav', speed_level)
     
     track = leg_1 + leg_2 + leg_3 + leg_4
+    track = track[0:timestep]
     
     return track
 
@@ -211,7 +214,7 @@ def lawn_shift (last_coord, camera):
     return new_coord
 
 
-def lawnmower (camera, speed_level = 1):
+def lawnmower (camera, speed_level = 1, timestep = 1000):
     
     # Figure 8 path simulation which will depend on boundary coords from camera model 
     # Returns vector of coords from simulated flight
@@ -243,7 +246,7 @@ def lawnmower (camera, speed_level = 1):
         new_y = shift_coord[1]
         #print(new_y)
         
-        if new_y < y_limit:
+        if new_y <= y_limit:
             y_shifts.append(new_y)
         else: break
     
@@ -252,25 +255,40 @@ def lawnmower (camera, speed_level = 1):
     
     points = [[(0,0)],[(x1,0)]] # rough starting point for vertical shift coords to be added, two added because of iteration
     shift_points = []
+
+    
+    counter = 0
     
     for i in range(0, len(right_list)):
+        #print(i)
         if i % 2 == 1:
             #print('i is odd')
             degree = 180
             leg = find_sample_points(left_list[i], right_list[i], degree, 'uav', speed_level)
             
+
         elif i % 2 == 0:
             #print('i is even')
             degree = 360
             leg = find_sample_points(right_list[i], left_list[i], degree, 'uav', speed_level)
-        
-        #print(points[i+1][-1])
-        #print(leg[0])
+           
+      
+        points.append(leg)
+        #print(counter)
+        counter += len(leg)
         shift = find_sample_points(points[i+1][-1], leg[0], 90, 'uav', speed_level) # estimate of distance between 
         #print(shift)
-        
-        points.append(leg)
         shift_points.append(shift)
+            
+        if counter >= timestep:
+            break
+        
+        
+     
+
+        #print(len(leg))  
+    
+    #shift_points.append(shift)
         
     points.pop(0) # Remove the dummy coords above
     points.pop(0)
@@ -288,15 +306,18 @@ def lawnmower (camera, speed_level = 1):
     coords.pop(0) # Start from first boundary coordinate
     flat_list = []
     for sublist in coords:
-        # Flatten list of lists while retaining nested lists, i.e coordinates
+        #Flatten list of lists while retaining nested lists, i.e coordinates
         for item in sublist:
             flat_list.append(item)
-            
+
+    flat_list = flat_list[0:timestep]       
     
     return flat_list
 
 
+
 #### Animal paths
+
 
 
 def angle_dist(angle, size = 1):
@@ -388,7 +409,7 @@ def random_walk (animal, start_coord, angle, timestep = 1000):
                 
      
     sample_coords = list(zip(x_list, y_list)) # zip up to create list of tuples, each being a set of coordinates where a sample has been taken
-    
+    sample_coords = sample_coords[0:timestep]
     return sample_coords 
 
 
@@ -420,7 +441,8 @@ def point_distance (pt1, pt2):
     return length
 
 
-def capture (animal_list, uav_list, camera, timestep = 1000):
+
+def capture (animal, animal_list, uav_list, camera, timestep = 1000, bias = 'no'):
     # Return a list of total hits and at what timestep (list of lists)
     # Capture occurs if point lies within boundary so dist between animal and uav must be < half height and half distance
     # Directly on the boarder not captured (probably wouldn't see in an actual image)
@@ -432,8 +454,8 @@ def capture (animal_list, uav_list, camera, timestep = 1000):
     # timestep: length of simulation
     
     # Reduce list down to certain number of timesteps (remeber there will be an extra one)
-    list1 = animal_list[0:(timestep+1)]
-    list2 = uav_list[0:(timestep+1)]
+    list1 = animal_list
+    list2 = uav_list
     
     # Specify boundary
     area = detection_zone(camera)
@@ -442,18 +464,20 @@ def capture (animal_list, uav_list, camera, timestep = 1000):
     # Hit dict
     hits = []
     
-    for i in range(0, len(list1)):
-        dist = point_distance(list1[i], list2[i])
-        if dist < half_area[0] or dist < half_area[1]:
-            #print('Hit at point', list1[i])
-            #print(dist)
-            #hits[i] = 1
-            success = (i,1)
-            hits.append(success)
-     
-
+    # List comps of distance between points and those inside boundaries
+    point_dist = [point_distance(x,y) for (x,y) in zip(list1, list2)]
+    point_inbounds = [(i) for (i,el) in enumerate(point_dist) if el < half_area[0] and el < half_area[1]]
+    #print(point_inbounds)
+    if bias == 'yes' and len(point_inbounds) > 0:
+        # Remove bias if specified, if not [] or [0,0]
+        no_remove = int(round(len(point_inbounds)*perception_bias(animal)))
+        if no_remove > 0:
+            point_inbounds = point_inbounds[:-(no_remove)]
+        else: pass
+    else : pass
     
-    return hits
+    return point_inbounds
+
 
 
 def simulation_animal(animal, path, timestep = 1000):
@@ -465,16 +489,16 @@ def simulation_animal(animal, path, timestep = 1000):
     
     
     if path == 'straight':
-        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0)
+        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0, timestep)
     
     if path == 'stop25':
-        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.25)
+        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.25, timestep)
     
     if path == 'stop50':
-        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.50)
+        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.50, timestep)
     
     if path == 'stop75':
-        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.75)
+        vector = find_sample_points([3750,0], [3750,7500], 90, animal, 0, 0.75, timestep)
     
     if path == 'random60':
          vector = random_walk(animal, [1,1], 60, timestep)
@@ -490,70 +514,55 @@ def simulation_animal(animal, path, timestep = 1000):
 
 
 
-def simulation_uav(camera, path, speed):
+
+def simulation_uav(camera, path, speed, timestep = 1000):
     # Output vector for simulation
     
     if path == 'lawnmower':
-        vector = lawnmower(camera, speed)
+        vector = lawnmower(camera, speed, timestep)
         
     if path == 'figure8':
-        vector = figure_8(camera, speed)
+        vector = figure_8(camera, speed, timestep)
         
     return vector
+    
 
 
 def hit_count(vect):
     
-    total = []
-    hits = []
+    if len(vect) > 0:
+    # If not an empty hit list
+        total = len(vect)
     
-    for i in vect:
-        total.append(i[1])
-        hits.append(i[0])
+        hit1 = vect[:-1] # Remove last
+        hit2 = vect[1:] # Remove first
     
-    total = sum(total)
+        count = 1
     
-    hit1 = hits[:-1] # Remove last
-    hit2 = hits[1:] # Remove first
+        for i in range(0, len(hit2)):
+            if(hit2[i] - hit1[i] == 1):
+                count == 1 # Remains as 1 if timesteps are ensuing
+            else: 
+                count += 1 # Add to count score to signifiy new individual
     
-    count = 1
-    
-    for i in range(0, len(hit2)):
-        if(hit2[i] - hit1[i] == 1):
-            count = 1 # Remains as 1 if timesteps are ensuing
-        else: 
-            count += 1 # Add to count score to signifiy new individual
-    
-    sim_score = [total, count]
+        sim_score = [total, count]
+        
+    else:
+        sim_score = [0,0]
     
     return sim_score
 
 
 
-def simulation (animal, animal_path, camera, uav_path, speed=1, bias = 'no'):
+def simulation (animal, animal_path, camera, uav_path, speed=1, timestep = 1000, bias = 'no'):
     # Running the simulation to produce the number of hits
     
     animal_vect = simulation_animal(animal, animal_path)
     uav_vect = simulation_uav(camera, uav_path, speed)
     
-    hit_vect = capture(animal_vect, uav_vect, camera)
-    
-    #print('Hits before', hit_vect)
-    
-    if bias == 'yes':
-        no_remove = int(round(len(hit_vect)*perception_bias(animal)))
-        hit_vect = hit_vect[:-(no_remove)]
-    else: pass
-    #print('Hits after', hits)
-    
-    if len(hit_vect) > 0:
-        score = hit_count(hit_vect)
-        #print(score)
-    else:
-        score = [0,0]
-        
-        
+    hits = capture(animal, animal_vect, uav_vect, camera, bias)
+    score = hit_count(hits)
+ 
     #output = [uav_path, camera, speed, animal, animal_path, bias, score[0], score[1]]
     
     return score
-
