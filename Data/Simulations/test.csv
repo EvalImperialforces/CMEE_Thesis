@@ -1,6 +1,0 @@
-Animal,Animal_path,Camera,UAV_path,Speed,Bias,Total_hits,Actual_hits
-reef,straight,garmin,lawnmower,1,yes,7,2
-reef,straight,garmin,lawnmower,1,no,6,2
-reef,straight,garmin,lawnmower,2,yes,8,2
-reef,straight,garmin,lawnmower,2,no,8,2
-reef,straight,garmin,figure8,1,yes,0,0

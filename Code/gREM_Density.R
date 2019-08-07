@@ -220,25 +220,14 @@ s_sensor.v <- 15.6
 s_f <- 16
 s_alt <- 77.5
 
-# Sony RX0 nadir
-n_sensor.h <- 13.2
-n_sensor.v <- 8.8
-n_f <- 7.7
-#heights = c(112,112,110,120,120,110,85,110,85,75,110,75,85,85,85,85,87.5,107.5,65,85,85,110)
-n_alt <- 95.63
-
 g_coverage.h <- (g_sensor.h/g_f)*g_alt
 g_coverage.v <- (g_sensor.v/g_f)*g_alt
 
 s_coverage.h <- (s_sensor.h/s_f)*s_alt
 s_coverage.v <- (s_sensor.v/s_f)*s_alt
 
-n_coverage.h <- (n_sensor.h/n_f)*n_alt
-n_coverage.v <- (n_sensor.v/n_f)*n_alt
-
 garmin_m2 <- g_coverage.h * g_coverage.v
 sony_m2 <- s_coverage.h * s_coverage.v
-nadir_m2 <- n_coverage.h * n_coverage.v
 
 
 
