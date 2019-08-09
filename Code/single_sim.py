@@ -554,13 +554,13 @@ def hit_count(vect):
 
 
 
-def simulation (animal, animal_path, camera, uav_path, speed=1, timestep = 1000, bias = 'no'):
+def simulation (animal, animal_path, camera, uav_path, speed=1,  bias = 'no', timestep = 1000):
     # Running the simulation to produce the number of hits
     
-    animal_vect = simulation_animal(animal, animal_path)
-    uav_vect = simulation_uav(camera, uav_path, speed)
+    animal_vect = simulation_animal(animal, animal_path, timestep)
+    uav_vect = simulation_uav(camera, uav_path, speed, timestep)
     
-    hits = capture(animal, animal_vect, uav_vect, camera, bias)
+    hits = capture(animal, animal_vect, uav_vect, camera, timestep, bias)
     score = hit_count(hits)
  
     #output = [uav_path, camera, speed, animal, animal_path, bias, score[0], score[1]]

@@ -22,10 +22,10 @@ original_biot <- read.csv("../Data/Metadata/BIOT/BIOT_2018.csv", header = T)
 original_biot <- subset(original_biot, original_biot$Flight.or.Grounded == 'Flight') # All images in flight
 # Subset by particular flights
 original_biot <- original_biot[original_biot$Flight == 1 | original_biot$Flight == 3 | original_biot$Flight == 7 | original_biot$Flight == 8 | original_biot$Flight == 10 | original_biot$Flight == 11 | original_biot$Flight == 12,  ]
-original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
+#original_bel1 <- read.csv("../Data/Metadata/Belize/21_02_19.csv", header = T)
 #original_bel1 <- cbind('Flight' = 1, original_bel1)
-original_bel1<- na.omit(original_bel1) 
-original_bel1 <- cbind('Flight' = 1, original_bel1)
+#original_bel1<- na.omit(original_bel1) 
+#original_bel1 <- cbind('Flight' = 1, original_bel1)
 
 ######################## Total count for each flight ###################################
 
@@ -38,12 +38,17 @@ biot_sum <- biot_lite %>%
 
 belize_sum <- belize_lite %>%
   group_by(Flight) %>% 
-  tally(c(Er1., Er2., manatee., turtle., ray., shark.))
+  tally(c(eagle.ray,turtle,manatee,shark,ray))
 
 
 total_count <- rbind(biot_sum, belize_sum)
 # Rename Belize flights
 total_count[8,1] <- 13
+total_count[9,1] <- 14
+total_count[10,1] <- 15
+total_count[11,1] <- 16
+total_count[12,1] <- 17
+total_count[13,1] <- 18
 
 Species_count_biot <- biot_lite %>%
   group_by(Flight) %>% 
