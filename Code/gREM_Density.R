@@ -186,8 +186,8 @@ names(total_count)[6] <- "Distance_(km)"
 total_count <- total_count %>% mutate(Speed <- (total_count [,5]/ total_count [,3]))
 total_count <- total_count %>% mutate(Speed <- (total_count [,5]/ total_count [,3]) * 3.6)
 
-names(total_count)[7] <- "Speed_(m/s)"
-names(total_count)[8] <- "Speed_(km/h)"
+names(total_count)[7] <- "Average_Speed_(m/s)"
+names(total_count)[8] <- "Average_Speed_(km/h)"
 
 #Average_speed_overall <- sum(Total_count_lite[,8]/ nrow(Total_count_lite)) # 17.8 m/s or 64 km/h
 #hist(Total_count_lite[,9])

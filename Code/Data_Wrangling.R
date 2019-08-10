@@ -169,8 +169,26 @@ Image_Removal <- function(flight_no, dataset = biot, start = 13, end = 26){
   return(flight_no)
 }
 
+overlap <- c(11, 29, 9, 38, 113, 12, 13, 22, 77, 20, 26, 31, 13) 
+                  
 
+Image_Removal2 <- function(flight_no, overlap, dataset = biot, start = 13, end = 26){
+  # Removes according to figures calculated from average speed (jupyter notebook, speed calculated from original_biot)
+  Flight_df <- subset(dataset, dataset$Flight == flight_no)
+  overlap_no <- overlap
+  New_Flight <- c()
+  for(i in 1:nrow(Flight_df)){
+    if (i %% overlap_no == 1){
+      New_Flight <- rbind(New_Flight, Flight_df[i,])
+    }
+  }
+  flight_no <- as.data.frame(New_Flight)
+  return(flight_no)
+}
 
+  
+  
+  
 New_Flight1 <- Image_Removal(1)
 New_Flight3 <- Image_Removal(3)
 New_Flight7 <- Image_Removal(7)
@@ -179,7 +197,6 @@ New_Flight10 <-Image_Removal(10)
 New_Flight11 <- Image_Removal(11)
 New_Flight12 <- Image_Removal(12)
 
-
 New_B1 <- Image_Removal(1, belize, 6, 10) 
 New_B2 <- Image_Removal(2, belize, 6, 10) 
 New_B3 <- Image_Removal(3, belize, 6, 10) 
@@ -187,10 +204,27 @@ New_B4 <- Image_Removal(4, belize, 6, 10)
 New_B5 <- Image_Removal(5, belize, 6, 10) 
 New_B6 <- Image_Removal(6, belize, 6, 10) 
 
+Diff_Flight1 <- Image_Removal2(1, overlap[1])
+Diff_Flight3 <- Image_Removal2(3, overlap[2])
+Diff_Flight7 <- Image_Removal2(7, overlap[3])
+Diff_Flight8 <- Image_Removal2(8, overlap[4])
+Diff_Flight10 <- Image_Removal2(10, overlap[5])
+Diff_Flight11 <- Image_Removal2(11, overlap[6])
+Diff_Flight12 <- Image_Removal2(12, overlap[7])
+
+Diff_B1 <- Image_Removal2(1, overlap[8], belize, 6, 10) 
+Diff_B2 <- Image_Removal2(2, overlap[9], belize, 6, 10) 
+Diff_B3 <- Image_Removal2(3, overlap[10], belize, 6, 10) 
+Diff_B4 <- Image_Removal2(4, overlap[11], belize, 6, 10) 
+Diff_B5 <- Image_Removal2(5, overlap[12], belize, 6, 10) 
+Diff_B6 <- Image_Removal2(6, overlap[13], belize, 6, 10) 
+
 biot_lite <- rbind(New_Flight1, New_Flight3, New_Flight7, New_Flight8, New_Flight10, New_Flight11, New_Flight12)
 belize_lite <- rbind(New_B1, New_B2, New_B3, New_B4, New_B5, New_B6)
 
+biot_lite2 <- rbind(Diff_Flight1, Diff_Flight3, Diff_Flight7, Diff_Flight8, Diff_Flight10, Diff_Flight11, Diff_Flight12)
+belize_lite2 <- rbind(Diff_B1, Diff_B2, Diff_B3, Diff_B4, Diff_B5, Diff_B6)
 
 # Remove everything except what we need
-rm(list=ls()[! ls() %in% c("biot_lite","belize_lite")])
+rm(list=ls()[! ls() %in% c("biot_lite","biot_lite2", "belize_lite", "belize_lite2", "belize")])
 
