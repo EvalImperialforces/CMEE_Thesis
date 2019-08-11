@@ -4,4 +4,4 @@
 # Date: Aug 2019
 
 
-sftp el1718@login.cx1.hpc.ic.ac.uk:/rds/general/user/el1718/home/Sims/Data/Simulations/* ../Data/Simulations/HPC1/
+sftp el1718@login.cx1.hpc.ic.ac.uk:/rds/general/user/el1718/home/Sims/Data/Simulations/* ../Data/Simulations/HPC2/
