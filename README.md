@@ -6,15 +6,15 @@
 
 
 ## Folder contents
-This folder contains coding scripts relating to the execution of my thesis. All files arranged in the '**Code**' and '**Code**'. Please contact my email should you wish to ask any questions: eva.linehan18@imperial.ac.uk.
+This folder contains coding scripts relating to the execution of my thesis. All files arranged in the '**Code**'. Please contact my email should you wish to access data used: eva.linehan18@imperial.ac.uk.
 
 ## Executing Project Analysis
-The main scripts that encompass project analysis are as follows;
+The main scripts that encompass project analysis are as follows and found in the '**Code**' directory;
 * Simulations.ipynb
 * Revised_Simulation_Analysis.ipynb
 * Revised_RealData_Analysis.ipynb
 
-All scripts require the same path directory in this repository.
+All scripts require the same path directory in this repository and data which is available upon request.
 
 ### '**Code**' contains the following; 
 
